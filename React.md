@@ -589,32 +589,408 @@ By updating the DOM only where necessary and minimizing direct interactions with
 
 In summary, when you change the state of a React component, React takes care of updating the Virtual DOM and, through its efficient reconciliation process, updates only the necessary parts of the actual DOM to match the new state. This approach is one of the key reasons React is known for its performance and developer-friendly features.
 
+---
+
+## `Passing Data Via Props`
+#### we are listing some topic of items, what if we would like to show different list of topics.
+> we would not like to create another list, but make use of existing list,(component reusability)
+
+### Reusing Components to Display Different Lists of Topics
+
+If you want to display different lists of topics without creating a separate list component, you can achieve this by using props in your React components. Props, short for properties, allow you to pass data from a parent component to a child component, making your code more reusable.
+
+### Using Props for Reusability
+
+You can pass data to your component by defining props and using them to customize the component's behavior. This way, you can show different lists without duplicating your code.
+
+### Modifying the Code
+
+To implement this, you can modify your component to accept two arguments: an array of items and a heading. In TypeScript, you can define this structure using an interface, for example:
+
+```typescript
+//in Type script, we can call it as interface
+//ex: {item:[], heading:string}
+
+interface TopicProps {
+  items: string[];
+  heading: string;
+}
+```
+
+ListGroup.tsx
+```ts
+import { useState } from "react";
+
+interface Props {
+    items: string[],
+    heading: string
+}
+
+function ListGroup(props: Props) { //Also add it in app.tsx
+
+    // let item = ['Hi', 'Manish', 'Singh']; //Moved this to App.tsx
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+
+    return (
+        <>
+            <h1>Heading</h1>
+            {props.items.length === 0 && <p>No item found</p>}
+            <ul>
+                {props.items.map((item, index) =>
+                    <li className={selectedIndex === index ? "active" : ""} key={item} onClick={() => { setSelectedIndex(index); }}>
+                        {item}
+                    </li>)}
+            </ul>
+        </>
+    );
+}
+
+export default ListGroup;
+```
+
+App.tsx
+```ts
+import ListGroup from "./components/ListGroup";
+
+let items = ['Mangalore', 'Bangalore', 'Chennai'];
+
+
+function App() {
+  return <div><ListGroup items={items} heading="cities" /></div>
+}
+
+export default App;
+```
+
+
+```ts
+//Props.items, is kind of repetative, hence destructuring in the function param
+import { useState } from "react";
+
+interface Props {
+    items: string[],
+    heading: string
+}
+
+function ListGroup({ items, heading }: Props) { //Destructering
+
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+
+    return (
+        <>
+            <h1>{heading}</h1>
+            {items.length === 0 && <p>No item found</p>}
+            <ul>
+                {items.map((item, index) =>
+                    <li className={selectedIndex === index ? "active" : ""} key={item} onClick={() => { setSelectedIndex(index); }}>
+                        {item}
+                    </li>)}
+            </ul>
+        </>
+    );
+
+}
+
+export default ListGroup;
+```
+## `prop drilling or passing callback props.`
+
+#### In real world example when we select an item, it needs to do something like printing, filtering or taking to the page etc
+#### We can include a seperate function and not touch the existing ListGroup function, 
+
+1. define a function logic in App component when a onclick is done in ListGroup,
+2. send it as argument to ListGroup.
+3. Add it in the props
+4. call the fun and send the selecteditem as param back to app component.
+
+
+App.tsx
+```ts
+import ListGroup from "./components/ListGroup";
+
+let items = ['Mangalore', 'Bangalore', 'Chennai'];
+
+const handleSelectItem = (item: string) => {
+  console.log(item);
+}
+
+function App() {
+  return <div><ListGroup items={items} heading="cities" onSelectItem={handleSelectItem} /></div>
+}
+
+export default App;
+```
+
+
+ListGroup.tsx
+```ts
+import { useState } from "react";
+
+interface Props {
+    items: string[],
+    heading: string,
+    onSelectItem: (item: string) => void; //Added the expected interface
+}
+
+function ListGroup({ items, heading, onSelectItem }: Props) { //Destructering
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+
+    return (
+        <>
+            <h1>{heading}</h1>
+            {items.length === 0 && <p>No item found</p>}
+            <ul>
+                {items.map((item, index) =>
+                    <li className={selectedIndex === index ? "active" : ""} key={item} onClick={() => { setSelectedIndex(index); onSelectItem(item); }}> //Added a function call
+                        {item}
+                    </li>)}
+            </ul >
+        </>
+    );
+
+}
+
+export default ListGroup;
+```
+<br>
+
+> suppose i want to write another function during onclick, from where i need to start defining things? from which component.
+
+If you want to add another function to be executed when an item is clicked, you can do so by defining that function in the parent component (App) and passing it as an additional prop to the child component (ListGroup). Here's how you can go about it:
+
+1. If you want to add another function to be executed when an item is clicked, you can do so by defining that function in the parent component (App) and passing it as an additional prop to the child component (ListGroup). Here's how you can go about it:
+
+```ts
+function handleAnotherAction(item) {
+  // Your logic for the additional action goes here
+  console.log(`Additional action for ${item}`);
+}
+```
+
+2. Pass this new function as a prop to the ListGroup component when rendering it in the App component:
+
+```ts
+function App() {
+  return (
+    <div>
+      <ListGroup
+        items={items}
+        heading="cities"
+        onSelectItem={handleSelectItem}
+        onAnotherAction={handleAnotherAction}
+      />
+    </div>
+  );
+}
+```
+
+3. In the ListGroup component, update the Props interface to include the new prop:
+
+```ts
+interface Props {
+  items: string[];
+  heading: string;
+  onSelectItem: (item: string) => void;
+  onAnotherAction: (item: string) => void;
+}
+```
+
+4. Modify the onClick event handler in the ListGroup component to call the new function when an item is clicked:
+
+```ts
+<li
+  className={selectedIndex === index ? "active" : ""}
+  key={item}
+  onClick={() => {
+    setSelectedIndex(index);
+    onSelectItem(item);
+    onAnotherAction(item); // Call the new function here
+  }}
+>
+  {item}
+</li>
+
+```
+<br>
+
+>what is this whole process is called?
+
+The process of passing multiple callback functions or handling multiple actions through props in a React component hierarchy is generally referred to as **"prop drilling" or "passing callback props."**
+
+Prop drilling occurs when you need to pass data or functions through several levels of nested components. In your case, you are passing both onSelectItem and onAnotherAction callback functions from the parent component (App) to a child component (ListGroup), and potentially even deeper into the component tree. This allows you to maintain a unidirectional data flow while still enabling different components at various levels to react to user interactions.
+
+While prop drilling is a common and valid approach in React, it can become cumbersome as your component tree grows larger and deeper. `In such cases, you might consider using state management libraries like Redux or React Context to centralize and manage your application's state and actions more efficiently, reducing the need for prop drilling.`
+
+
+
+---
+## `Passing Childern`
+## How to create a component that can pass the childern
+
+
+#### create a component Alert.tsx
+
+Alert.tsx
+```ts
+interface Props {
+    text: string
+}
+
+function Alert({ text }: Props) {
+    return <div>{text}</div>
+}
+
+export default Alert;
+```
+
+App.tsx
+```ts
+import ListGroup from "./components/ListGroup";
+import Alert from "./components/Alert";
+
+let items = ['Mangalore', 'Bangalore', 'Chennai'];
+
+const handleSelectItem = (item: string) => {
+  console.log(item);
+}
+
+function App() {
+  return <>
+    <div><ListGroup items={items} heading="cities" onSelectItem={handleSelectItem} /></div>
+    <Alert text="Hello World" /> //Added this
+  </>
+}
+
+export default App;
+```
+<br>
+
+> what if the text is huge in Alert?
+
+You could think of below code to do that.
+But thats not gonna work.
+
+```ts
+import ListGroup from "./components/ListGroup";
+import Alert from "./components/Alert";
+
+let items = ['Mangalore', 'Bangalore', 'Chennai'];
+
+const handleSelectItem = (item: string) => {
+  console.log(item);
+}
+
+function App() {
+  return <>
+    <div><ListGroup items={items} heading="cities" onSelectItem={handleSelectItem} /></div>
+    <Alert>
+      "Hello World hghdfg lijgdsiug" //You may think of like this
+    </Alert>
+  </>
+}
+
+export default App;
+```
+<br>
+
+`solution`
+
+In React Interface Props we can remove the text property and add children.
+
+```ts
+interface Props {
+    children: string
+}
+
+function Alert({ children }: Props) {
+    return <div>{children}</div>
+}
+
+export default Alert;
+```
+
+```ts
+import ListGroup from "./components/ListGroup";
+import Alert from "./components/Alert";
+
+let items = ['Mangalore', 'Bangalore', 'Chennai'];
+
+const handleSelectItem = (item: string) => {
+  console.log(item);
+}
+
+function App() {
+  return <>
+    <div><ListGroup items={items} heading="cities" onSelectItem={handleSelectItem} /></div>
+    <Alert>
+        "Hello World sdssdd"
+        "dhgdsgfdsh"
+    </Alert>
+  </>
+}
+
+export default App;
+```
+<br>
+
+![Alt text](image-1.png)
+
+
+<br>
+
+> what if we want to pass the html elements?
+
+like below
+
+```ts
+<Alert>
+      Hello World <span>Hi</span>
+</Alert>
+```
+To achive this we need to make change in Interface in Alert.tsx
+
+```tsx
+import { ReactNode } from 'react';
+
+interface Props {
+    children: ReactNode
+}
+
+function Alert({ children }: Props) {
+    return <div>{children}</div>
+}
+
+export default Alert;
+```
+
+```tsx
+import ListGroup from "./components/ListGroup";
+import Alert from "./components/Alert";
+
+let items = ['Mangalore', 'Bangalore', 'Chennai'];
+
+const handleSelectItem = (item: string) => {
+  console.log(item);
+}
+
+function App() {
+  return <>
+    <div><ListGroup items={items} heading="cities" onSelectItem={handleSelectItem} /></div>
+    <Alert>
+      Hello World <span>Hi</span>
+    </Alert>
+  </>
+}
+
+export default App;
+
+```
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+---
 
 # React Interview Questions and Answers
 
