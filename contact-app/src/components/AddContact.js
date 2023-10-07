@@ -1,12 +1,15 @@
 //Class Component
 import React from "react";
 
+
+
 class AddContact extends React.Component {
 
     state = {
         name: "",
         email: ""
     }
+
 
     add = (e) => {
         e.preventDefault();
@@ -16,6 +19,7 @@ class AddContact extends React.Component {
         }
         this.props.addContactHandler(this.state);
         this.setState({ name: "", email: "" });
+        alert("Contact Added successfully");
     }
 
 
