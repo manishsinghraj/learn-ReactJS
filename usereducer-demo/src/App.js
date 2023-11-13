@@ -1,9 +1,9 @@
-import { useReducer } from 'react';
 import './App.css';
+import React, { useReducer } from 'react'
 
 const ACTIONS = {
-  INCREMENT: "increment",
-  DECREMENT: "decrement",
+  INCREMENT: 'increment',
+  DECREMENT: 'decrement',
   RESET: 'reset'
 }
 
@@ -12,28 +12,20 @@ const reducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.INCREMENT:
       return { count: state.count + 1 };
-
     case ACTIONS.DECREMENT:
-      if (state.count === 0) {
-        alert("Counter has reached its end!");
-        return state;
-      } else {
-        return { count: state.count - 1 };
-      }
-
+      return { count: state.count - 1 };
     case ACTIONS.RESET:
       return { count: 0 };
-
     default:
       return state;
   }
 }
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, { count: 0 })
 
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
 
-  const handleIncreament = () => {
+  const handleIncrement = () => {
     dispatch({ type: ACTIONS.INCREMENT });
   }
 
@@ -45,13 +37,12 @@ function App() {
     dispatch({ type: ACTIONS.RESET });
   }
 
-
   return (
     <div className="App">
-      <button onClick={handleIncreament}> + </button>
-      <span> {state.count} </span>
-      <button onClick={handleDecrement}> - </button>
-      <button id='reset' onClick={handleReset}>Reset</button>
+      <button onClick={handleIncrement}>+</button>
+      <span>{state.count}</span>
+      <button onClick={handleDecrement}>-</button>
+      <button onClick={handleReset} id='reset'>Reset</button>
     </div>
   );
 }
