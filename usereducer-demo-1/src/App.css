@@ -1,0 +1,10 @@
+.App {
+  text-align: center;
+  margin-top: 20%;
+}
+
+
+.todo {
+  display: flex;
+  flex-direction: column;
+}
