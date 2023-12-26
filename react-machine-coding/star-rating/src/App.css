@@ -1,0 +1,26 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 40px;
+  flex-direction: column;
+}
+
+/* .stars > span {
+  color: rgb(233, 190, 33);
+} */
+
+
+.stars>span {
+  cursor: pointer;
+}
+
+.selected {
+  color: rgb(233, 190, 33);
+}
