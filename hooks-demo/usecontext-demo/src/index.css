@@ -1,0 +1,15 @@
+.main-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.btn {
+  border: 2px solid white !important;
+}
+
+.btn.light {
+  border: 2px solid black !important;
+}
