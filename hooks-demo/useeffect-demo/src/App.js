@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const URL = `https://api.openweathermap.org/data/2.5/weather?units=metric&q=delhi&apiKey=5aef23acb6dce58a7de7eab676b10ef8`;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+const URL = `https://api.openweathermap.org/data/2.5/weather?units=metric&q=delhi&apiKey=${API_KEY}`;
 
 function App() {
   const [temp, setTemp] = useState(0);
@@ -11,8 +13,9 @@ function App() {
       try {
         const result = await fetch(URL);
         const data = await result.json();
+        console.log(data)
         setTemp(data.main.temp);
-        console.log("hio")
+        console.log("hi")
       } catch (error) {
         console.error('Error fetching data:', error);
       }
